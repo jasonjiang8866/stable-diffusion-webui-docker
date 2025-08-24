@@ -100,6 +100,8 @@ Make sure the required [dependencies](https://github.com/AUTOMATIC1111/stable-di
 - [Intel CPUs, Intel GPUs (both integrated and discrete)](https://github.com/openvinotoolkit/stable-diffusion-webui/wiki/Installation-on-Intel-Silicon) (external wiki page)
 - [Ascend NPUs](https://github.com/wangshuai09/stable-diffusion-webui/wiki/Install-and-run-on-Ascend-NPUs) (external wiki page)
 
+**For easy deployment, see [Docker Installation and Running](#docker-installation-and-running) section below.**
+
 Alternatively, use online services (like Google Colab):
 
 - [List of Online Services](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Online-Services)
@@ -159,6 +161,110 @@ git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui
 ### Installation on Apple Silicon
 
 Find the instructions [here](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Installation-on-Apple-Silicon).
+
+## Docker Installation and Running
+
+This repository includes Docker support for easy deployment of Stable Diffusion Web UI. The Docker setup provides a containerized environment with all dependencies pre-installed.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) installed on your system
+- [NVIDIA Docker](https://github.com/NVIDIA/nvidia-docker) for GPU support (recommended)
+- NVIDIA GPU with CUDA support (for optimal performance)
+
+### Building the Docker Image
+
+1. Clone this repository:
+```bash
+git clone https://github.com/jasonjiang8866/stable-diffusion-webui-docker.git
+cd stable-diffusion-webui-docker
+```
+
+2. Build the Docker image:
+```bash
+docker build -t webui:v3 .
+```
+
+The build process will:
+- Use PyTorch 2.2.2 with CUDA 12.1 and cuDNN 8 runtime as base image
+- Install system dependencies including tcmalloc for improved memory performance
+- Create a non-root user (`miku`) for security
+- Set up the Stable Diffusion Web UI environment
+- Expose ports 7860, 7861, and 7862
+
+### Running the Container
+
+#### Basic Usage
+```bash
+docker run --gpus all -p 7860:7860 webui:v3
+```
+
+#### Advanced Usage with Volume Mounts (Recommended)
+```bash
+docker run --name stable-diffusion-webui \
+  --gpus=0 \
+  -p 8088:7860 \
+  -v /path/to/your/models:/app/models \
+  -v /path/to/your/outputs:/app/outputs \
+  -v /path/to/your/embeddings:/app/embeddings \
+  -v /path/to/your/extensions:/app/extensions \
+  --env NVIDIA_VISIBLE_DEVICES=0 \
+  --env CUDA_VISIBLE_DEVICES=0 \
+  -d webui:v3
+```
+
+> **Note**: See `docker_cmd.sh` for a complete example command with all volume mounts configured.
+
+Replace `/path/to/your/` with actual paths on your host system where you want to store:
+- **models**: Stable Diffusion model files
+- **outputs**: Generated images
+- **embeddings**: Textual inversion embeddings
+- **extensions**: Additional extensions
+
+#### Container Configuration Options
+
+- `--gpus=0`: Use specific GPU (0 = first GPU, `all` = all GPUs)
+- `-p 8088:7860`: Map container port 7860 to host port 8088 (access via http://localhost:8088)
+- `-d`: Run container in detached mode
+- `--name`: Assign a name to the container for easier management
+- Volume mounts preserve your data between container restarts
+
+#### Environment Variables
+
+- `NVIDIA_VISIBLE_DEVICES`: Control which GPUs are visible to the container
+- `CUDA_VISIBLE_DEVICES`: Control which CUDA devices are available
+
+### Accessing the Web UI
+
+Once the container is running, open your web browser and navigate to:
+- `http://localhost:7860` (if using default port mapping)
+- `http://localhost:8088` (if using the advanced example above)
+
+### Container Management
+
+```bash
+# View running containers
+docker ps
+
+# Stop the container
+docker stop stable-diffusion-webui
+
+# Start the container
+docker start stable-diffusion-webui
+
+# View container logs
+docker logs stable-diffusion-webui
+
+# Remove the container
+docker rm stable-diffusion-webui
+```
+
+### Notes
+
+- The container runs with `--listen` and `--no-half-vae` flags by default
+- For first-time setup, the container will download required models automatically
+- Volume mounts are highly recommended to persist your models, outputs, and settings
+- The Docker setup includes tcmalloc for improved CPU memory usage
 
 ## Contributing
 Here's how to add code to this repo: [Contributing](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Contributing)
