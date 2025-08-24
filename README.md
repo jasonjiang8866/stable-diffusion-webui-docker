@@ -100,6 +100,8 @@ Make sure the required [dependencies](https://github.com/AUTOMATIC1111/stable-di
 - [Intel CPUs, Intel GPUs (both integrated and discrete)](https://github.com/openvinotoolkit/stable-diffusion-webui/wiki/Installation-on-Intel-Silicon) (external wiki page)
 - [Ascend NPUs](https://github.com/wangshuai09/stable-diffusion-webui/wiki/Install-and-run-on-Ascend-NPUs) (external wiki page)
 
+**For easy deployment, see [Docker Installation and Running](#docker-installation-and-running) section below.**
+
 Alternatively, use online services (like Google Colab):
 
 - [List of Online Services](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Online-Services)
